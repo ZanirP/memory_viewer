@@ -1,0 +1,102 @@
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main-page {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  background-color: black; /* Dark theme */
+  color: white;
+}
+
+/* Left side (Text Editor + Controls) */
+.left-panel {
+  flex: 1; /* Takes up 1/2 of the screen */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Right side (Registers + Memory) */
+.right-panel {
+  flex: 1; /* Takes up 1/2 of the screen */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  justify-content: space-between; /* Distribute space evenly */
+}
+
+.registers-container {
+  width: 100%; /* Ensure it takes the full width of the right panel */ 
+  height: 40%; /* Adjust height as needed */
+  margin: 10px 0; /* Adjust margins as needed */
+  padding: 10px; /* Reduce padding */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  color: black; /* Ensure text is readable on white background */
+}
+
+.registers-table-container {
+  height: 50%; /* Ensure it takes the full height of the container */
+  overflow-y: auto;
+}
+
+.registers-table {
+  width: 100%;
+  height: 50%;
+  border-collapse: collapse;
+}
+
+.registers-table th, .registers-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.registers-table th {
+  background-color: #f0f0f0;
+}
+
+/* Memory table */
+.memory-container {
+  width: 100%; /* Ensure it takes the full width of the right panel */
+  height: 40%; /* Adjust height as needed */
+  margin: 10px 0; /* Adjust margins as needed */
+  padding: 10px; /* Reduce padding */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  color: black; /* Ensure text is readable on white background */
+}
+
+.memory-table-container {
+  height: 50%; /* Ensure it takes the full height of the container */
+  overflow-y: auto;
+}
+
+.memory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.memory-table th, .memory-table td {
+  padding: 5px; /* Reduce padding */
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.memory-table th {
+  background-color: #f0f0f0;
+}
