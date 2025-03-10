@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getRegisters } from '../api';
 import '../App.css';
 
-const Registers = () => {
+const Registers = ({refresh}) => {
   const [registers, setRegisters] = useState({});
 
   const fetchRegisters = async () => {
@@ -16,13 +16,12 @@ const Registers = () => {
       setRegisters(response.data.registers || {});
     } catch (err) {
       console.log("Failed to fetch registers", err);
-      alert('Failed to fetch registers', err);
     }
   };
 
   useEffect(() => {
     fetchRegisters();
-  }, []);
+  }, [refresh]);
 
   return (
     <div className="registers-container">

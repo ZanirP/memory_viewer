@@ -2,14 +2,19 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-from instructions.instructions import Instruction
+from instructions.Other.noParse import No_Instruction
 from core.registers import Registers, RegistersModel
 from core.memory import Memory, MemoryModel
 from core.parser import InstructionParser
+from pydantic import BaseModel
 
 app = FastAPI()
+
+class InstructionRequest(BaseModel):
+	instructions: List[str]
+
 origins = [
-	"http://localhost:3000"
+	"http://localhost:3000",
 	# put the actual website here
 ]
 
@@ -25,39 +30,50 @@ memory_db = {
     
     "Instructions": [],
     "Queue": None,
-    "current_instruction": -1,
+    "current_instruction": None,
     "registers": Registers(),
     "memory": Memory()
 }
 
 
-@app.post(path="/save")
-def save_instruction(instructions: List[Instruction]):
-    # TODO: Implement this function
+@app.post(path="/save", response_model=None)
+def save_instruction(data: InstructionRequest):
+    instructions = data.instructions
+    print("DEBUG - Instructions: ", instructions)
+    print("DEBUG - Instructions Type: ", type(instructions))
     memory_db["Instructions"] = instructions
+    memory_db["current_instruction"] = No_Instruction()
+    memory_db["registers"] = Registers()
+    memory_db["memory"] = Memory()
     memory_db["Queue"] = InstructionParser(instructions).return_queue()
-    return {"message": "Save functionality not completed yet"}
 
-@app.post(path="/run-next-line")
+@app.post(path="/run-next-line", response_model=None)
 def run_next_line():
-	memory_db["current_instruction"] += 1
-	memory_db["Queue"].get().execute(memory_db["registers"], memory_db["memory"])
-	return {"message": "Ran next line"}
+    if memory_db["current_instruction"].isReverted == True:
+        memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
+        return {"message": "Instruction Executed"}
+    else:
+        memory_db["current_instruction"] =  memory_db["Queue"].get()
+        memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
+        return {"message": "Instruction Executed"}
 
-@app.post(path="/revert")
+@app.post(path="/revert", response_model=None)
 def revert():
-    # TODO: Implement this function
-	return {"message": "Revert functionality not implemented yet"}
+    memory_db["current_instruction"].revert(memory_db["registers"], memory_db["memory"])
 
-@app.post(path="/reset")
+@app.post(path="/reset", response_model=None)
 def reset():
-    # TODO: Implement this function
-	return {"message": "Reset functionality not implemented yet"}
+	memory_db["Instructions"] = []
+	memory_db["current_instruction"] = None
+	memory_db["registers"] = Registers()
+	memory_db["memory"] = Memory()
+	memory_db["Queue"] = None
 
-@app.post(path="/run-all")
+@app.post(path="/run-all", response_model=None)
 def run_all():
-    # TODO: Implement this function
-	return {"message": "Run all functionality not implemented yet"}
+    while memory_db["Queue"].empty() == False:
+        memory_db["current_instruction"] = memory_db["Queue"].get()
+        memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
 
 @app.get(path="/registers", response_model=RegistersModel)
 def registers():

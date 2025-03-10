@@ -4,13 +4,14 @@ import {useState, useEffect} from 'react';
 import {getMemory} from '../api';
 import '../App.css';
 
-const Memory = () => {
+const Memory = ({refresh}) => {
 	const [memory, setMemory] = useState({});
 
 	const fetchMemory = async () => {
 		try{
 			const response = await getMemory();
 			console.log("Fetched Memory", response.data);
+
 
 			Object.entries(response.data.memory).forEach(([key, value]) => {
 				console.log('${key}:', value, "Type: ", typeof value);
@@ -25,13 +26,13 @@ const Memory = () => {
 	useEffect(() => {
 		fetchMemory();
 	}
-	, []);
+	, [refresh]);
 
 	return (
 		<div className="memory-container">
 			<h3>Memory</h3>
 			<div className="memory-table-container">
-			<table class="memory-table">
+			<table className="memory-table">
 				<thead>
 					<tr>
 						<th>Address</th>

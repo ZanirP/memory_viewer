@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Instruction(ABC):
     """
     Abstract base class for all ARMv8 instructions.
@@ -26,7 +27,8 @@ class Instruction(ABC):
         Raises:
             NotImplementedError: If the subclass does not implement this method.
         """
-        pass
+        self.isReverted = False
+        return
 
     @abstractmethod
     def execute(self, registers, memory):
@@ -43,10 +45,10 @@ class Instruction(ABC):
         Raises:
             NotImplementedError: If the subclass does not implement this method.
         """
-        pass
+        return
 
     @abstractmethod
-    def revert(self):
+    def revert(self, registers, memory):
         """
         Reverts the instruction execution.
 
@@ -56,4 +58,4 @@ class Instruction(ABC):
         Raises:
             NotImplementedError: If the subclass does not implement this method.
         """
-        pass
+        return

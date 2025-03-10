@@ -1,12 +1,12 @@
 # Memory Viewer
 
 Memory Viewer is a tool designed to help developers visualize and analyze memory usage in their ARMv8 code. This tool provides a graphical interface to inspect memory allocations, deallocations, and overall memory consumption. (at least it will when it is done)
+I am planning on deploying soon! Just as a MVP I will work on updates from time to time! 
 
 ## Next steps 
  - Store and Load aren't working so I think that has to do with me not fully understanding what is suppose to occur - going to do research - and fix those files
- - actually have to connect frontend and backend: right now it's kinda 1/2 connected? - priority
  - Front-end will need lots of work to make it look nice, right now is just MVP
-
+ - UnitTests need to be MASSIVELY improved - i.e. needs to test overflow, (for everything), and test all other funtionalities of ARM (edge cases and things ARM does in a weird way)
 
 ## Features
 

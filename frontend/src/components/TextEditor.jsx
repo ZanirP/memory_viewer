@@ -1,8 +1,9 @@
 // Handle Writing and saving the ARMv8 assembly code
 import {useState} from 'react';
-import {saveInstructions} from '../api';
+import Controls from '../components/Controls';
 
-const TextEditor = () => {
+
+const TextEditor = ({triggerUpdate}) => {
   const [code, setCode] = useState('');
 
 
@@ -15,6 +16,7 @@ const TextEditor = () => {
 		cols="50"
 		placeholder="Write your ARMv8 assembly code here"
 	  />
+	  <Controls code={code} triggerUpdate={triggerUpdate} />
 	</div>
   );
 };

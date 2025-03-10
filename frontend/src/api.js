@@ -10,7 +10,7 @@ export const saveInstructions = async (instructions) => {
 };
 
 export const runNextLine = async () => {
-  return api.post('/run');
+  return api.post('/run-next-line');
 }
 
 export const revert = async () => {

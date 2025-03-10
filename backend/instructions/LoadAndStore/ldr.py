@@ -7,6 +7,7 @@ class LDR_Instruction(Instruction):
         self.base = base
         self.offset = offset
         self.previous_value = None
+        self.isReverted = False
         
     
     def execute(self, registers, memory):
@@ -18,8 +19,10 @@ class LDR_Instruction(Instruction):
         self.previous_value = registers.get(self.destination)        
         loaded_value = memory.load_double_word(address)
         registers.set(self.destination, loaded_value)
+        self.isReverted = False
                 
     def revert(self, registers):
         if self.previous_value is not None:
             registers.set(self.destination, self.previous_value)
             self.previous_value = None
+            self.isReverted = True

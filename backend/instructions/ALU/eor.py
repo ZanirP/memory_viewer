@@ -9,6 +9,7 @@ class EOR_Instruction(Instruction):
         self.reg2_or_immediate = reg2_or_immediate
         self.is_immiedate = reg2_or_immediate.startswith("X") == False
         self.previous_value = None
+        self.isReverted = False
         
     def execute(self, registers, memory):
         
@@ -20,9 +21,12 @@ class EOR_Instruction(Instruction):
             result = registers.get(self.reg1) ^ registers.get(self.reg2_or_immediate)
             
         registers.set(self.destination, result & 0xFFFFFFFFFFFFFFFF)
+        self.isReverted = False
         
-    def revert(self, registers):
+        
+    def revert(self, registers, memory):
         
         if self.previous_value is not None:
             registers.set(self.destination, self.previous_value)
             self.previous_value = None
+            self.isReverted = True
