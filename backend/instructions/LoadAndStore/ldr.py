@@ -13,7 +13,7 @@ class LDR_Instruction(Instruction):
     
     def execute(self, registers, memory):
         address = registers.get(self.base) + self.offset
-        eslf.target_address = address
+        self.target_address = address
         
         if address % 8 != 0:
             raise ValueError("Unaligned memory access")

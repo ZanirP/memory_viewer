@@ -14,6 +14,7 @@ from .Other.noParse import No_Instruction
 
 instruction_set = {
     # ALU operations
+    "MOV" : MOV_Instruction,
 	"ADD" : ADD_Instruction,
 	"AND" : AND_Instruction,
 	"EOR" : EOR_Instruction,
@@ -36,6 +37,7 @@ instruction_set = {
 }
 
 instruction_format = {
+    MOV_Instruction: "Rd, #immediate",
 	ADD_Instruction: "Rd,Rn,Rm",
 	AND_Instruction: "Rd,Rn,Rm",
 	EOR_Instruction: "Rd,Rn,Rm",

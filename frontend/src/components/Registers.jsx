@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getRegisters } from '../api';
 import '../App.css';
 
-const Registers = ({ refresh, lastChangedRegister = 'X0' }) => {
+const Registers = ({ refresh, lastChangedRegister }) => {
   const [registers, setRegisters] = useState({});
   const activeRowRef = useRef(null);
 
@@ -42,7 +42,7 @@ const Registers = ({ refresh, lastChangedRegister = 'X0' }) => {
           </thead>
           <tbody>
             {Object.entries(registers).map(([register, value]) => {
-              const isChanged = register === lastChangedRegister;
+              const isChanged = lastChangedRegister && register.toUpperCase() === String(lastChangedRegister).toUpperCase();
               return (
                 <tr 
                   key={register} 

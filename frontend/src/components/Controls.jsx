@@ -4,17 +4,20 @@ import '../App.css';
 const Controls = ({ code, triggerUpdate, activeLine, setActiveLine }) => {
   const handleNext = async () => {
     try {
-      await runNextLine();
+      const response = await runNextLine();
+	  const {changedRegister, changedAddress} = response.data;
 	  setActiveLine(prevLine => prevLine + 1);
-      triggerUpdate();    
-    } catch (err) {
+	  triggerUpdate(changedRegister, changedAddress);
+	}   
+    catch (err) {
       console.error("Error in handleNext:", err);
     }
   };
 
   const handleRevert = async () => {
     try {
-      await revert();
+      const response = await revert();
+	  const {changedRegister, changedAddress} = response.data;
 	  setActiveLine(prev => Math.max(1, prev - 1));
       triggerUpdate();
     } catch (err) {

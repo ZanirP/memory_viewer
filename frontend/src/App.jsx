@@ -15,10 +15,13 @@ const App = () => {
   const [lastChangedRegister, setLastChangedRegister] = useState(null);
   const [lastChangedAddress, setLastChangedAddress] = useState(null);
 
-  async function triggerUpdate() {
+  async function triggerUpdate(changedRegister = null, changedAddress = null) {
     try{
-      console.log('Triggering update');
+      console.log('Triggering update with changedRegister:', changedRegister, 'and changedAddress:', changedAddress);
 
+
+      setLastChangedRegister(changedRegister);
+      setLastChangedAddress(changedAddress);
       const registerResponse = await getRegisters();
       setRegistersData(registerResponse.data.Registers || {})
       const memoryResponse = await getMemory();

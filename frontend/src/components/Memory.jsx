@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getMemory } from '../api';
 import '../App.css';
 
-const Memory = ({ refresh, lastChangedAddress = '0' }) => {
+const Memory = ({ refresh, lastChangedAddress }) => {
   const [memory, setMemory] = useState({});
   const activeRowRef = useRef(null);
 
@@ -42,7 +42,7 @@ const Memory = ({ refresh, lastChangedAddress = '0' }) => {
           </thead>
           <tbody>
             {Object.entries(memory).map(([address, value]) => {
-              const isChanged = String(address) === String(lastChangedAddress);
+              const isChanged = lastChangedAddress !== null && address.toUpperCase() === String(lastChangedAddress).toUpperCase();
               return (
                 <tr 
                   key={address} 
