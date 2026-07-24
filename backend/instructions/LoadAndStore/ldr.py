@@ -23,7 +23,7 @@ class LDR_Instruction(Instruction):
         registers.set(self.destination, loaded_value)
         self.isReverted = False
                 
-    def revert(self, registers):
+    def revert(self, registers, memory=None):
         if self.previous_value is not None:
             registers.set(self.destination, self.previous_value)
             self.previous_value = None

@@ -7,6 +7,7 @@ from .ALU.LSR import LSR_Instruction
 from .ALU.mul import MUL_Instruction
 from .ALU.orr import ORR_Instruction
 from .ALU.sub import SUB_Instruction
+from .ALU.mov import MOV_Instruction
 from .LoadAndStore.ldr import LDR_Instruction
 from .LoadAndStore.str import STR_Instruction
 from .Other.noParse import No_Instruction

@@ -24,6 +24,8 @@ class STR_Instruction(Instruction):
         
         self.previous_value = memory.load_double_word(address)
         value_store = registers.get(self.reg)
+        if value_store is None or not isinstance(value_store, int):
+            raise ValueError("Invalid source register ", value_store)
         memory.store_double_word(address, value_store)
         self.isReverted = False
         
