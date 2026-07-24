@@ -6,12 +6,18 @@ from instructions.instruction_set import instruction_set
 class InstructionParser:
     
     def __init__(self, instructions):
+        if isinstance(instructions, str):
+            instructions = instructions.splitlines()
+            
         self.instructions = instructions
         self.queue = Queue()
         
         for instruction in instructions:
-            self.queue.put(self.parse(instruction))
-            
+            cleaned = instruction.strip()
+            if not cleaned or cleaned.startswith("#") or cleaned.startswith("//"):
+                continue
+            parsed_instruction = self.parse(cleaned)
+            self.queue.put(parsed_instruction)         
         
         
         
