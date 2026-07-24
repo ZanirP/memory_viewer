@@ -113,6 +113,14 @@ app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
-	return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+    # Don't try to serve index.html if the request was meant for an API endpoint
+    if full_path.startswith("api/") or full_path in ["registers", "memory", "save", "run-next-line", "revert"]:
+        raise HTTPException(status_code=404, detail="API route not found")
+        
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"error": "Frontend build not found. Run 'npm run build' inside /frontend first."}
+
 if __name__ == "__main__":
 	uvicorn.run(app, host="0.0.0.0", port=8000)
