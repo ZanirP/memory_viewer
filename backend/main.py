@@ -1,5 +1,8 @@
+import os
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from instructions.Other.noParse import No_Instruction
@@ -13,19 +16,15 @@ app = FastAPI()
 class InstructionRequest(BaseModel):
 	instructions: List[str]
 
-origins = [
-	"http://localhost:3000",
-    "https://memoryviewer-frontend.vercel.app/",
-	# put the actual website here
-]
+if os.getenv("ENV", "development") == "development":
+	app.add_middleware(
+		CORSMiddleware,
+		allow_origins=["http://localhost:3000"],
+		allow_credentials=True,
+		allow_methods=["*"],
+		allow_headers=["*"],
+	)
 
-app.add_middleware(
-	CORSMiddleware,
-	allow_origins=origins,
-	allow_credentials=True,
-	allow_methods=["*"],
-	allow_headers=["*"]
-)
 
 memory_db = {
     
@@ -108,6 +107,12 @@ def memory():
 	return MemoryModel(memory=memory_db["memory"].to_dict())
 
 
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 
+app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="assets")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+	return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
 if __name__ == "__main__":
 	uvicorn.run(app, host="0.0.0.0", port=8000)
