@@ -38,9 +38,9 @@ flex: 1;
   border-radius: 8px;
   border: 1px solid #2a2e39;
   
-  /* Set a max height so scroll kicks in when items exceed it */
   max-height: 250px; /* Adjust this height as needed */
   overflow-y: auto;  /* Restores vertical scrolling */
+  position: relative; /* Ensure the container is positioned for the scrollbar */
 }
 
 /* Optional: Make the scrollbars sleek & dark-mode friendly */

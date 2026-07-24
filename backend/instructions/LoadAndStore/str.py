@@ -8,11 +8,14 @@ class STR_Instruction(Instruction):
         self.offset = offset
         self.previous_value = None
         self.isReverted = False
+        self.destination = None
+        self.target_address = None
         
     
     def execute(self, registers, memory):
         value = registers.get(self.base)
         address = value + self.offset
+        self.target_address = address
         
         if value is None or not isinstance(value, int):
             raise ValueError("Invalid base register ", self.base)

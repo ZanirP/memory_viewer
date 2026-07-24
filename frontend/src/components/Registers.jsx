@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getRegisters } from '../api';
 import '../App.css';
 
-const Registers = ({ refresh, lastChangedRegister = 'X0' }) => { // Defaults to 'X0' for testing visuals!
+const Registers = ({ refresh, lastChangedRegister = 'X0' }) => {
   const [registers, setRegisters] = useState({});
+  const activeRowRef = useRef(null);
 
   const fetchRegisters = async () => {
     try {
@@ -17,6 +18,16 @@ const Registers = ({ refresh, lastChangedRegister = 'X0' }) => { // Defaults to 
   useEffect(() => {
     fetchRegisters();
   }, [refresh]);
+
+  // Smoothly scroll to the updated register row whenever lastChangedRegister changes
+  useEffect(() => {
+    if (activeRowRef.current) {
+      activeRowRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [lastChangedRegister, registers]);
 
   return (
     <div className="registers-container">
@@ -35,6 +46,7 @@ const Registers = ({ refresh, lastChangedRegister = 'X0' }) => { // Defaults to 
               return (
                 <tr 
                   key={register} 
+                  ref={isChanged ? activeRowRef : null} // Attach ref if changed
                   className={isChanged ? "pulse-highlight" : ""}
                 >
                   <td>{register}</td>

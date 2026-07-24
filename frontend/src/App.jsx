@@ -12,6 +12,9 @@ const App = () => {
   const [activeLine, setActiveLine] = useState(1);  
   const [refresh, setRefresh] = useState(false);
 
+  const [lastChangedRegister, setLastChangedRegister] = useState(null);
+  const [lastChangedAddress, setLastChangedAddress] = useState(null);
+
   async function triggerUpdate() {
     try{
       console.log('Triggering update');
@@ -22,7 +25,6 @@ const App = () => {
       setMemoryData(memoryResponse.data.Memory || {})
 
       setRefresh(!refresh);
-      console.log('Update triggered');
     }
     catch (err){
       console.error('Error in triggerUpdate: ', err);
@@ -40,8 +42,8 @@ const App = () => {
         />
       </div>
       <div className="right-panel">
-        <Registers refresh={refresh} />
-        <Memory refresh={refresh} />
+        <Registers refresh={refresh} lastChangedRegister={lastChangedRegister} />
+        <Memory refresh={refresh} lastChangedAddress={lastChangedAddress} />
       </div>
     </div>
   );

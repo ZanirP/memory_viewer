@@ -1,22 +1,33 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMemory } from '../api';
 import '../App.css';
 
 const Memory = ({ refresh, lastChangedAddress = '0' }) => {
   const [memory, setMemory] = useState({});
+  const activeRowRef = useRef(null);
 
   const fetchMemory = async () => {
     try {
       const response = await getMemory();
       setMemory(response.data.memory || {});
     } catch (err) {
-      alert('Failed to fetch memory ' + err.message);
+      console.log("Failed to fetch memory", err);
     }
   };
 
   useEffect(() => {
     fetchMemory();
   }, [refresh]);
+
+  // Smoothly scroll to the updated memory row whenever lastChangedAddress changes
+  useEffect(() => {
+    if (activeRowRef.current) {
+      activeRowRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [lastChangedAddress, memory]);
 
   return (
     <div className="memory-container">
@@ -35,6 +46,7 @@ const Memory = ({ refresh, lastChangedAddress = '0' }) => {
               return (
                 <tr 
                   key={address} 
+                  ref={isChanged ? activeRowRef : null} // Attach ref if changed
                   className={isChanged ? "pulse-highlight" : ""}
                 >
                   <td>{address}</td>

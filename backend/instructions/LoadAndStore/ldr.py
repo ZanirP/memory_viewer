@@ -8,10 +8,12 @@ class LDR_Instruction(Instruction):
         self.offset = offset
         self.previous_value = None
         self.isReverted = False
+        self.target_address = None
         
     
     def execute(self, registers, memory):
         address = registers.get(self.base) + self.offset
+        eslf.target_address = address
         
         if address % 8 != 0:
             raise ValueError("Unaligned memory access")

@@ -50,17 +50,40 @@ def save_instruction(data: InstructionRequest):
 
 @app.post(path="/run-next-line", response_model=None)
 def run_next_line():
-    if memory_db["current_instruction"].isReverted == True:
-        memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
-        return {"message": "Instruction Executed"}
+    instruction = memory_db["current_instruction"]
+    if instruction.isReverted == True:
+        instruction.execute(memory_db["registers"], memory_db["memory"])
+        
     else:
-        memory_db["current_instruction"] =  memory_db["Queue"].get()
-        memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
-        return {"message": "Instruction Executed"}
+        instruction =  memory_db["Queue"].get()
+        memory_db["current_instruction"] = instruction
+        instruction.execute(memory_db["registers"], memory_db["memory"])
+        
+    changed_reg = getattr(instruction, 'destination', None)
+    changed_mem = getattr(instruction, 'target_address', None)
+    
+    return {
+        "message": "Executed next instruction",
+        "changedRegister": changed_reg,
+        "changedAddress": str(changed_mem) if changed_mem is not None else None
+    }
+    
+    
+        
 
 @app.post(path="/revert", response_model=None)
 def revert():
-    memory_db["current_instruction"].revert(memory_db["registers"], memory_db["memory"])
+    instruction = memory_db["current_instruction"]
+    instruction.revert(memory_db["registers"], memory_db["memory"])
+    
+    changed_reg = getattr(instruction, 'destination', None)
+    changed_mem = getattr(instruction, 'target_address', None)
+    
+    return {
+        "message": "Reverted last instruction",
+        "changedRegister": changed_reg,
+        "changedAddress": str( changed_mem) if changed_mem is not None else None
+    }
 
 @app.post(path="/reset", response_model=None)
 def reset():
