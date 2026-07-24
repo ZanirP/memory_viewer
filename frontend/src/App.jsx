@@ -9,6 +9,7 @@ import './App.css';
 const App = () => {
   const [RegistersData, setRegistersData] = useState({});
   const [MemoryData, setMemoryData] = useState({});
+  const [activeLine, setActiveLine] = useState(1);  
   const [refresh, setRefresh] = useState(false);
 
   async function triggerUpdate() {
@@ -32,8 +33,11 @@ const App = () => {
     <div className="main-page">
       <div className="left-panel">
         <h2>ARMv8 Memory Viewer</h2>
-        <TextEditor triggerUpdate={triggerUpdate} />
-        <Controls triggerUpdate={triggerUpdate} />
+        <TextEditor 
+          triggerUpdate={triggerUpdate} 
+          activeLine={activeLine} 
+          setActiveLine={setActiveLine} 
+        />
       </div>
       <div className="right-panel">
         <Registers refresh={refresh} />
