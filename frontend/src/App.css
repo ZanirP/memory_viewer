@@ -159,6 +159,11 @@ flex: 1;
   transition: all 0.2s ease;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-primary {
   background-color: #2ecc71;
   color: #121212;
