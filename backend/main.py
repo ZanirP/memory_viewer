@@ -15,6 +15,7 @@ class InstructionRequest(BaseModel):
 
 origins = [
 	"http://localhost:3000",
+    "https://memoryviewer-frontend.vercel.app/",
 	# put the actual website here
 ]
 

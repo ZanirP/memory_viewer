@@ -12,14 +12,14 @@ class STR_Instruction(Instruction):
     
     def execute(self, registers, memory):
         value = registers.get(self.base)
-        
-        if self.base is None or not isinstance(self.base, int):
-            raise ValueError("Invalid base register")
-        
         address = value + self.offset
         
-        self.previous_value = memory.load_double_word(address)
+        if value is None or not isinstance(value, int):
+            raise ValueError("Invalid base register ", self.base)
+        if address % 8 != 0:
+            raise ValueError("Unaligned memory access")        
         
+        self.previous_value = memory.load_double_word(address)
         value_store = registers.get(self.reg)
         memory.store_double_word(address, value_store)
         self.isReverted = False
