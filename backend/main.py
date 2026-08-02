@@ -30,7 +30,6 @@ memory_db = {
     
     "Instructions": [],
     "Instruction_Memory": None,
-    "current_address": 0,
     "current_instruction": None,
     "registers": Registers(),
     "memory": Memory()
@@ -45,7 +44,7 @@ def save_instruction(data: InstructionRequest):
     memory_db["current_instruction"] = No_Instruction()
     memory_db["registers"] = Registers()
     memory_db["memory"] = Memory()
-    memory_db["current_address"] = 0
+    memory_db["registers"]["PC"] = 0
     memory_db["Instruction_Memory"] = InstructionParser(instructions).return_instruction_memory()
     print("DEBUG - Instruction Memory: ", memory_db["Instruction_Memory"])
 
@@ -54,13 +53,13 @@ def run_next_line():
     instruction = memory_db["current_instruction"]
     if instruction.isReverted == True:
         instruction.execute(memory_db["registers"], memory_db["memory"])
-        memory_db["current_address"] += 4 # TODO: fix this when branching is implemented
+        memory_db["registers"]["PC"] += 4 # TODO: fix this when branching is implemented
         
     else:
-        instruction =  memory_db["Instruction_Memory"].get(memory_db["current_address"], No_Instruction())
+        instruction =  memory_db["Instruction_Memory"].get(memory_db["registers"]["PC"], No_Instruction())
         memory_db["current_instruction"] = instruction
         instruction.execute(memory_db["registers"], memory_db["memory"])
-        memory_db["current_address"] += 4 # TODO: fix this when branching is implemented
+        memory_db["registers"]["PC"] += 4 # TODO: fix this when branching is implemented
 
     changed_reg = getattr(instruction, 'destination', None)
     changed_mem = getattr(instruction, 'target_address', None)
@@ -78,7 +77,7 @@ def run_next_line():
 def revert():
     instruction = memory_db["current_instruction"]
     instruction.revert(memory_db["registers"], memory_db["memory"])
-    memory_db["current_address"] -= 4 # TODO: fix this when branching is implemented
+    memory_db["registers"]["PC"] -= 4 # TODO: fix this when branching is implemented
     
     changed_reg = getattr(instruction, 'destination', None)
     changed_mem = getattr(instruction, 'target_address', None)
@@ -99,11 +98,12 @@ def reset():
 
 @app.post(path="/run-all", response_model=None)
 def run_all():
+    memory_db["registers"]["PC"] = 0
     while memory_db["Instruction_Memory"] and len(memory_db["Instruction_Memory"]) > 0:
         memory_db["current_instruction"] = memory_db["Instruction_Memory"].get(
-            memory_db["current_address"], No_Instruction())
+            memory_db["registers"]["PC"], No_Instruction())
         memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
-        memory_db["current_address"] += 4 # TODO: fix this when branching is implemented
+        memory_db["registers"]["PC"] += 4 # TODO: fix this when branching is implemented
 
 @app.get(path="/registers", response_model=RegistersModel)
 def registers():
