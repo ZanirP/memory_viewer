@@ -44,7 +44,7 @@ def save_instruction(data: InstructionRequest):
     memory_db["current_instruction"] = No_Instruction()
     memory_db["registers"] = Registers()
     memory_db["memory"] = Memory()
-    memory_db["registers"]["PC"] = 0
+    memory_db["registers"].set("PC", 0)
     memory_db["Instruction_Memory"] = InstructionParser(instructions).return_instruction_memory()
     print("DEBUG - Instruction Memory: ", memory_db["Instruction_Memory"])
 
