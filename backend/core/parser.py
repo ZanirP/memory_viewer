@@ -1,4 +1,3 @@
-from queue import Queue
 from instructions.instruction_set import instruction_set
 
 
@@ -10,14 +9,18 @@ class InstructionParser:
             instructions = instructions.splitlines()
             
         self.instructions = instructions
-        self.queue = Queue()
+        self.instruction_memory = {}
+        self.current_address = 0
         
         for instruction in instructions:
             cleaned = instruction.strip()
+            
             if not cleaned or cleaned.startswith("#") or cleaned.startswith("//"):
                 continue
+            
             parsed_instruction = self.parse(cleaned)
-            self.queue.put(parsed_instruction)         
+            self.instruction_memory[self.current_address] = parsed_instruction
+            self.current_address += 4      
         
         
         
@@ -39,8 +42,8 @@ class InstructionParser:
         opcode, operands = self.classify_instruction(instruction)
         return instruction_set[opcode](*operands)
     
-    def return_queue(self):
-        return self.queue
+    def return_instruction_memory(self):
+        return self.instruction_memory
         
         
         
