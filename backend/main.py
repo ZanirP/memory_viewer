@@ -76,8 +76,14 @@ def run_next_line():
 @app.post(path="/revert", response_model=None)
 def revert():
     instruction = memory_db["current_instruction"]
-    instruction.revert(memory_db["registers"], memory_db["memory"])
-    memory_db["registers"]["PC"] -= 4 # TODO: fix this when branching is implemented
+    pc = memory_db["registers"].get("PC")
+
+    try:
+        instruction.revert(memory_db["registers"], memory_db["memory"])
+    except TypeError:
+        instruction.revert(memory_db["registers"])
+
+    memory_db["registers"].set("PC", max(0, pc - 4))  # TODO: fix this when branching is implemented
     
     changed_reg = getattr(instruction, 'destination', None)
     changed_mem = getattr(instruction, 'target_address', None)
