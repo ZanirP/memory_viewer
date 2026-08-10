@@ -53,13 +53,15 @@ def run_next_line():
     instruction = memory_db["current_instruction"]
     if instruction.isReverted == True:
         instruction.execute(memory_db["registers"], memory_db["memory"])
-        memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4) # TODO: fix this when branching is implemented
+        if not getattr(instruction, "updates_pc", False):
+            memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4)
         
     else:
         instruction =  memory_db["Instruction_Memory"].get(memory_db["registers"].get("PC"), No_Instruction())
         memory_db["current_instruction"] = instruction
         instruction.execute(memory_db["registers"], memory_db["memory"])
-        memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4) # TODO: fix this when branching is implemented
+        if not getattr(instruction, "updates_pc", False):
+            memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4)
 
     changed_reg = getattr(instruction, 'destination', None)
     changed_mem = getattr(instruction, 'target_address', None)
@@ -83,7 +85,8 @@ def revert():
     except TypeError:
         instruction.revert(memory_db["registers"])
 
-    memory_db["registers"].set("PC", max(0, pc - 4))  # TODO: fix this when branching is implemented
+    if not getattr(instruction, "updates_pc", False):
+        memory_db["registers"].set("PC", max(0, pc - 4))
     
     changed_reg = getattr(instruction, 'destination', None)
     changed_mem = getattr(instruction, 'target_address', None)
@@ -109,7 +112,8 @@ def run_all():
         memory_db["current_instruction"] = memory_db["Instruction_Memory"].get(
             memory_db["registers"].get("PC"), No_Instruction())
         memory_db["current_instruction"].execute(memory_db["registers"], memory_db["memory"])
-        memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4) # TODO: fix this when branching is implemented
+        if not getattr(memory_db["current_instruction"], "updates_pc", False):
+            memory_db["registers"].set("PC", memory_db["registers"].get("PC") + 4)
 
 @app.get(path="/registers", response_model=RegistersModel)
 def registers():
