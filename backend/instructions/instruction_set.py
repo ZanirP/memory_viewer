@@ -11,6 +11,7 @@ from .ALU.mov import MOV_Instruction
 from .LoadAndStore.ldr import LDR_Instruction
 from .LoadAndStore.str import STR_Instruction
 from .Other.noParse import No_Instruction
+from .Branching.branch import Branch_Instruction
 
 
 instruction_set = {
@@ -30,7 +31,7 @@ instruction_set = {
     "STR" : STR_Instruction,
     
     # Branching operations
-    
+    "B" : Branch_Instruction,
     
     
     "Other" : No_Instruction
@@ -50,6 +51,7 @@ instruction_format = {
  
     LDR_Instruction: "Rd, [Rn, #offset]",
 	STR_Instruction: "Rd, [Rn, #offset]",
+	Branch_Instruction: "label",
 	
 	
 	No_Instruction: "No instruction"
