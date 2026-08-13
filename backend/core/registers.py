@@ -10,13 +10,18 @@ class Registers:
         self.registers["PC"] = 0
         
     def get(self, reg):
-        return self.registers.get(reg, None)
+        if reg not in self.registers:
+            raise ValueError(f"Invalid register: {reg}")
+        return self.registers[reg]
         
     def set(self, reg, value):
-        if reg in self.registers:
-            self.registers[reg] = value
-        else:
-            raise ValueError(f"Invalid Registers: {reg}")
+        if reg not in self.registers:
+            raise ValueError(f"Invalid register: {reg}")
+        if not isinstance(value, int):
+            raise ValueError(f"Register values must be integers: {reg}")
+        if reg == "XZR":
+            return
+        self.registers[reg] = value if reg == "PC" else value & 0xFFFFFFFFFFFFFFFF
         
     def __repr__(self):
         return str(self.registers)

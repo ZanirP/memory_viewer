@@ -4,7 +4,7 @@ class MOV_Instruction(Instruction):
 	
 	def __init__(self, destination, immediate):
 		self.destination = destination
-		self.immediate = immediate
+		self.immediate = int(immediate, 0)
 		self.previous_value = None
 		self.isReverted = False
 		

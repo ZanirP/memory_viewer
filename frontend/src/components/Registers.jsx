@@ -4,14 +4,22 @@ import '../App.css';
 
 const Registers = ({ refresh, lastChangedRegister }) => {
   const [registers, setRegisters] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const activeRowRef = useRef(null);
+  const requestIdRef = useRef(0);
 
   const fetchRegisters = async () => {
+    const requestId = ++requestIdRef.current;
     try {
+      setIsLoading(true);
+      setError('');
       const response = await getRegisters();
-      setRegisters(response.data.registers || {});
+      if (requestId === requestIdRef.current) setRegisters(response.data.registers || {});
     } catch (err) {
-      console.log("Failed to fetch registers", err);
+      if (requestId === requestIdRef.current) setError(err.response?.data?.detail || err.message);
+    } finally {
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
   };
 
@@ -32,6 +40,8 @@ const Registers = ({ refresh, lastChangedRegister }) => {
   return (
     <div className="registers-container">
       <h3>Registers</h3>
+      {isLoading && <div role="status">Loading registers…</div>}
+      {error && <div role="alert">Failed to load registers: {error}</div>}
       <div className="registers-table-container">
         <table className="registers-table">
           <thead>

@@ -1,12 +1,20 @@
 import axios from 'axios';
 
 const API_BASE_URL = 
-  process.env.NODE_ENV === 'development' 
+  import.meta.env.DEV
     ? 'http://localhost:8000' 
     : window.location.origin;
+
+const SESSION_KEY = 'memory-viewer-session-id';
+let sessionId = sessionStorage.getItem(SESSION_KEY);
+if (!sessionId) {
+  sessionId = crypto.randomUUID();
+  sessionStorage.setItem(SESSION_KEY, sessionId);
+}
   
 const api = axios.create({
   baseURL: API_BASE_URL,
+  headers: { 'X-Session-ID': sessionId },
 });
 
 
@@ -36,6 +44,10 @@ export const getRegisters = async () => {
 
 export const getMemory = async () => {
   return api.get('/memory');
+}
+
+export const getProgram = async () => {
+  return api.get('/program');
 }
 
 export default api;

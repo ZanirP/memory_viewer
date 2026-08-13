@@ -8,13 +8,21 @@ class Memory:
     
     def load_double_word(self, address):
         ''' Load a 8-byte word from memory '''
-        if address % 8 != 0:
-            raise ValueError("Unaligned memory")
+        self._validate_double_word_address(address)
         return int.from_bytes(self.memory[address:address+8], "little")
     
     def store_double_word(self, address, value):
         ''' Store a 8-byte word to memory'''
-        self.memory[address:address+8] = value.to_bytes(8, "little")
+        self._validate_double_word_address(address)
+        self.memory[address:address+8] = (value & 0xFFFFFFFFFFFFFFFF).to_bytes(8, "little")
+
+    def _validate_double_word_address(self, address):
+        if not isinstance(address, int):
+            raise ValueError("Memory address must be an integer")
+        if address % 8 != 0:
+            raise ValueError("Unaligned memory")
+        if address < 0 or address + 8 > len(self.memory):
+            raise ValueError(f"Memory address out of bounds: {address}")
         
     def to_dict(self):
         return {

@@ -17,7 +17,7 @@ class AND_Instruction(Instruction):
         self.isReverted = False
         
         if self.is_immiedate:
-            result = registers.get(self.reg1) & int(self.reg2_or_immediate)
+            result = registers.get(self.reg1) & int(self.reg2_or_immediate, 0)
         else:
             result = registers.get(self.reg1) & registers.get(self.reg2_or_immediate)
             

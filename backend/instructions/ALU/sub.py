@@ -19,4 +19,4 @@ class SUB_Instruction(Instruction):
         if self.previous_value is not None:
             registers.set(self.destination, self.previous_value)
             self.previous_value = None
-            self.isReverted - True
+            self.isReverted = True
