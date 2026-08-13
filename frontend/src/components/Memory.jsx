@@ -4,14 +4,22 @@ import '../App.css';
 
 const Memory = ({ refresh, lastChangedAddress }) => {
   const [memory, setMemory] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const activeRowRef = useRef(null);
+  const requestIdRef = useRef(0);
 
   const fetchMemory = async () => {
+    const requestId = ++requestIdRef.current;
     try {
+      setIsLoading(true);
+      setError('');
       const response = await getMemory();
-      setMemory(response.data.memory || {});
+      if (requestId === requestIdRef.current) setMemory(response.data.memory || {});
     } catch (err) {
-      console.log("Failed to fetch memory", err);
+      if (requestId === requestIdRef.current) setError(err.response?.data?.detail || err.message);
+    } finally {
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
   };
 
@@ -32,6 +40,8 @@ const Memory = ({ refresh, lastChangedAddress }) => {
   return (
     <div className="memory-container">
       <h3>Memory</h3>
+      {isLoading && <div role="status">Loading memory…</div>}
+      {error && <div role="alert">Failed to load memory: {error}</div>}
       <div className="memory-table-container">
         <table className="memory-table">
           <thead>

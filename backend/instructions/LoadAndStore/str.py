@@ -5,11 +5,12 @@ class STR_Instruction(Instruction):
     def __init__(self, reg, base, offset=0):
         self.reg = reg
         self.base = base
-        self.offset = offset
+        self.offset = int(offset, 0) if isinstance(offset, str) else offset
         self.previous_value = None
         self.isReverted = False
         self.destination = None
         self.target_address = None
+        self.writes_memory = True
         
     
     def execute(self, registers, memory):

@@ -5,7 +5,7 @@ class LDR_Instruction(Instruction):
     def __init__(self, destination, base, offset=0):
         self.destination = destination
         self.base = base
-        self.offset = offset
+        self.offset = int(offset, 0) if isinstance(offset, str) else offset
         self.previous_value = None
         self.isReverted = False
         self.target_address = None

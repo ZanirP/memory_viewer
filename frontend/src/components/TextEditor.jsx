@@ -9,6 +9,7 @@ ORR X1, X1, #1000
 STR X0, [X1]
 LDR X2, [X1]`
   );
+  const [savedCode, setSavedCode] = useState(null);
 
   // Split code into lines so we can render line numbers and active indicators
   const lines = code.split('\n');
@@ -46,8 +47,8 @@ LDR X2, [X1]`
       </div>
 
       {/* Controls passed code state */}
-      <Controls code={code} triggerUpdate={triggerUpdate} 
-	  activeLine={activeLine} setActiveLine={setActiveLine} />
+      <Controls code={code} savedCode={savedCode} setSavedCode={setSavedCode}
+        setCode={setCode} triggerUpdate={triggerUpdate} setActiveLine={setActiveLine} />
     </div>
   );
 };

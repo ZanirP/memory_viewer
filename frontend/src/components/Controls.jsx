@@ -1,83 +1,111 @@
-import { runNextLine, revert, runAll, saveInstructions } from "../api";
-import React, { useState } from 'react';
+import { useRef, useState } from 'react';
+import { getProgram, reset, runNextLine, revert, runAll, saveInstructions } from '../api';
 import '../App.css';
 
-const Controls = ({ code, triggerUpdate, activeLine, setActiveLine }) => {
+const errorMessage = (error) => error.response?.data?.detail || error.message;
+
+const Controls = ({ code, savedCode, setSavedCode, setCode, triggerUpdate, setActiveLine }) => {
   const [canRevert, setCanRevert] = useState(false);
-  const handleNext = async () => {
-    try {
+  const [isBusy, setIsBusy] = useState(false);
+  const [status, setStatus] = useState('');
+  const busyRef = useRef(false);
+  const isDirty = code !== savedCode;
 
-      if (activeLine === 1) {
-        await saveInstructions(code.split("\n"));
-      }
-      const response = await runNextLine();
-	  const {changedRegister, changedAddress} = response.data;
-	  setActiveLine(prevLine => prevLine + 1);
-    setCanRevert(true);
-	  triggerUpdate(changedRegister, changedAddress);
-	}   
-    catch (err) {
-      console.error("Error in handleNext:", err);
-    }
-  };
-
-  const handleRevert = async () => {
-    try {
-      const response = await revert();
-	  const {changedRegister, changedAddress} = response.data;
-	  setActiveLine(prev => Math.max(1, prev - 1));
+  const saveCurrentCode = async () => {
+    const response = await saveInstructions(code.split('\n'));
+    setSavedCode(code);
+    setActiveLine(response.data.activeLine ?? 1);
     setCanRevert(false);
-      triggerUpdate();
-    } catch (err) {
-      alert('Failed to revert: ' + err.message);
-    }
+    setStatus('Program saved.');
   };
 
-  const handleRunAll = async () => {
+  const perform = async (pendingMessage, operation) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setIsBusy(true);
+    setStatus(pendingMessage);
     try {
-      if (activeLine === 1) {
-        await saveInstructions(code.split("\n"));
-      }
-      await runAll();
-	  const totalLines = code.split("\n").length;
-	  setActiveLine(totalLines);
-      triggerUpdate();
-    } catch (err) {
-      alert('Failed to run all: ' + err.message);
+      await operation();
+    } catch (error) {
+      setStatus(errorMessage(error));
+    } finally {
+      busyRef.current = false;
+      setIsBusy(false);
     }
   };
 
-  const handleSave = async () => {
-    if (!code) {
-      alert("No instructions to save");
+  const handleNext = () => perform('Stepping…', async () => {
+    if (isDirty) await saveCurrentCode();
+    const response = await runNextLine();
+    const { changedRegister, changedAddress, activeLine } = response.data;
+    if (activeLine != null) setActiveLine(activeLine);
+    setCanRevert(Boolean(response.data.canRevert));
+    setStatus(response.data.message);
+    await triggerUpdate(changedRegister, changedAddress);
+  });
+
+  const handleRevert = () => perform('Reverting…', async () => {
+    const response = await revert();
+    const { changedRegister, changedAddress, activeLine } = response.data;
+    if (activeLine != null) setActiveLine(activeLine);
+    setCanRevert(Boolean(response.data.canRevert));
+    setStatus(response.data.message);
+    await triggerUpdate(changedRegister, changedAddress);
+  });
+
+  const handleRunAll = () => perform('Running…', async () => {
+    if (isDirty) await saveCurrentCode();
+    const response = await runAll();
+    setActiveLine(response.data.activeLine ?? code.split('\n').length);
+    setCanRevert(Boolean(response.data.canRevert));
+    setStatus(`${response.data.message} (${response.data.steps} steps).`);
+    await triggerUpdate();
+  });
+
+  const handleSave = () => {
+    if (!code.trim()) {
+      setStatus('No instructions to save.');
       return;
     }
-    try {
-      await saveInstructions(code.split("\n"));
-	  setActiveLine(1);
-    setCanRevert(false);
-      triggerUpdate();
-      alert('Instructions saved!');
-    } catch (err) {
-      alert('Failed to save instructions: ' + err.message);
-    }
+    perform('Saving…', async () => {
+      await saveCurrentCode();
+      await triggerUpdate();
+    });
   };
 
+  const handleLoad = () => perform('Loading program…', async () => {
+    const response = await getProgram();
+    const loadedCode = response.data.instructions.join('\n');
+    setCode(loadedCode);
+    setSavedCode(loadedCode);
+    setActiveLine(response.data.activeLine ?? 1);
+    setCanRevert(Boolean(response.data.canRevert));
+    setStatus(loadedCode ? 'Program loaded.' : 'No saved program exists.');
+    await triggerUpdate();
+  });
+
+  const handleReset = () => perform('Resetting…', async () => {
+    await reset();
+    setCode('');
+    setSavedCode('');
+    setActiveLine(1);
+    setCanRevert(false);
+    setStatus('Simulator reset.');
+    await triggerUpdate();
+  });
+
   return (
-    <div className="controls-toolbar">
-      <button className="btn btn-primary" onClick={handleNext}>
-        ▶ Step Next
-      </button>
-      <button className="btn btn-secondary" onClick={handleRunAll}>
-        ⏩ Run All
-      </button>
-      <button className="btn btn-secondary" onClick={handleRevert} disabled={!canRevert || activeLine <= 1}>
-        ↩ Revert
-      </button>
-      <button className="btn btn-accent" onClick={handleSave}>
-        💾 Save Code
-      </button>
-    </div>
+    <>
+      <div className="controls-toolbar">
+        <button className="btn btn-primary" onClick={handleNext} disabled={isBusy}>▶ Step Next</button>
+        <button className="btn btn-secondary" onClick={handleRunAll} disabled={isBusy}>⏩ Run All</button>
+        <button className="btn btn-secondary" onClick={handleRevert} disabled={isBusy || !canRevert}>↩ Revert</button>
+        <button className="btn btn-accent" onClick={handleSave} disabled={isBusy}>💾 Save Code{isDirty ? ' *' : ''}</button>
+        <button className="btn btn-secondary" onClick={handleLoad} disabled={isBusy}>Load</button>
+        <button className="btn btn-secondary" onClick={handleReset} disabled={isBusy}>Reset</button>
+      </div>
+      <div role="status" aria-live="polite">{status}</div>
+    </>
   );
 };
 

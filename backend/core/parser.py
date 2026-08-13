@@ -10,10 +10,11 @@ class InstructionParser:
             
         self.instructions = instructions
         self.instruction_memory = {}
+        self.address_to_line = {}
         self.labels = {}
         self.current_address = 0
 
-        for instruction in instructions:
+        for line_number, instruction in enumerate(instructions, start=1):
             cleaned = instruction.strip()
             if not cleaned or cleaned.startswith("#") or cleaned.startswith("//"):
                 continue
@@ -32,7 +33,7 @@ class InstructionParser:
                 self.current_address += 4
 
         self.current_address = 0
-        for instruction in instructions:
+        for line_number, instruction in enumerate(instructions, start=1):
             cleaned = instruction.strip()
             
             if not cleaned or cleaned.startswith("#") or cleaned.startswith("//"):
@@ -44,12 +45,16 @@ class InstructionParser:
                 if not cleaned:
                     continue
             
-            parsed_instruction = self.parse(cleaned)
+            try:
+                parsed_instruction = self.parse(cleaned)
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"Line {line_number}: {error}") from error
             if parsed_instruction.__class__.__name__ == "Branch_Instruction":
                 if parsed_instruction.label not in self.labels:
                     raise ValueError(f"Undefined label: {parsed_instruction.label}")
                 parsed_instruction.target_address = self.labels[parsed_instruction.label]
             self.instruction_memory[self.current_address] = parsed_instruction
+            self.address_to_line[self.current_address] = line_number
             self.current_address += 4      
         
         
@@ -57,16 +62,18 @@ class InstructionParser:
 		
     def classify_instruction(self, instruction):
         instruction = instruction.strip().split(maxsplit=1)
-        opcode = instruction[0]
+        opcode = instruction[0].upper()
         operands = instruction[1] if len(instruction) > 1 else None
         
         if opcode in instruction_set:
             # fit operands to expected format
             # we could just strip the "," and "[, ]" chracters and then split
+            if operands is None:
+                raise ValueError(f"Missing operands for {opcode}")
             operands = operands.strip().replace(",", " ").replace("[", " ").replace("]", " ").replace("#", "").split()
             return opcode, operands
         else:
-            return "Other", []
+            raise ValueError(f"Unknown opcode: {opcode}")
         
     def parse(self, instruction):
         opcode, operands = self.classify_instruction(instruction)
@@ -77,5 +84,8 @@ class InstructionParser:
 
     def return_labels(self):
         return self.labels
+
+    def return_address_to_line(self):
+        return self.address_to_line
         
         

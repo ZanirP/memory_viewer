@@ -1,28 +1,13 @@
-import unittest
+"""Compatibility smoke tests for the current parser API.
 
-from .testAdd import TestInstructionParser as TestAdd
-from .testAnd import TestInstructionParser as TestAnd
-from .testEOR import TestInstructionParser as TestEOR
-from .testLDR import TestInstructionParser as TestLDR
-from .testLSL import TestInstructionParser as TestLSL
-from .testLSR import TestInstructionParser as TestLSR
-from .testORR import TestInstructionParser as TestORR
-from .testSTR import TestInstructionParser as TestSTR
-from .testSUB import TestInstructionParser as TestSUB
+The original suite imported obsolete queue- and byte-memory-based tests. Current
+behavior is covered by the pytest regression modules in this directory.
+"""
 
-def suite():
-	suite = unittest.TestSuite()
-	suite.addTest(TestAdd())
-	suite.addTest(TestAnd())
-	suite.addTest(TestEOR())
-	suite.addTest(TestLDR())
-	suite.addTest(TestLSL())
-	suite.addTest(TestLSR())
-	suite.addTest(TestORR())
-	suite.addTest(TestSTR())
-	suite.addTest(TestSUB())
-	return suite
+from core.parser import InstructionParser
 
-if __name__ == '__main__':
-	runner = unittest.TextTestRunner()
-	runner.run(suite())
+
+def test_parser_exposes_instruction_memory():
+    parser = InstructionParser(["MOV X0, #1"])
+
+    assert list(parser.return_instruction_memory()) == [0]
