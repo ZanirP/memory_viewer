@@ -43,6 +43,38 @@ flex: 1;
   position: relative; /* Ensure the container is positioned for the scrollbar */
 }
 
+.cache-table-container {
+  background-color: #16181d;
+  border: 1px solid #2a2e39;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.cache-heading, .cache-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cache-result {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-weight: 700;
+}
+
+.cache-hit { background: rgba(46, 204, 113, 0.2); color: #65e89d; }
+.cache-miss { background: rgba(231, 76, 60, 0.2); color: #ff8174; }
+.cache-stats { margin-bottom: 10px; color: #aeb7c4; }
+.cache-stats strong { color: #f4f7fa; }
+.cache-table { width: 100%; border-collapse: collapse; }
+.cache-table th, .cache-table td,
+.registers-table th, .registers-table td,
+.memory-table th, .memory-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
+.cache-line-active { background-color: rgba(52, 152, 219, 0.28); box-shadow: inset 3px 0 #3498db; }
+.cache-config { margin-top: 8px; color: #858d99; font-size: 0.85rem; }
+
 /* Optional: Make the scrollbars sleek & dark-mode friendly */
 .registers-table-container::-webkit-scrollbar,
 .memory-table-container::-webkit-scrollbar {

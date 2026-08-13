@@ -46,6 +46,10 @@ export const getMemory = async () => {
   return api.get('/memory');
 }
 
+export const getCache = async () => {
+  return api.get('/cache');
+}
+
 export const getProgram = async () => {
   return api.get('/program');
 }

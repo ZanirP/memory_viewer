@@ -2,6 +2,7 @@ import { useState } from 'react';
 import TextEditor from './components/TextEditor';
 import Memory from './components/Memory';
 import Registers from './components/Registers';
+import Cache from './components/Cache';
 import './App.css';
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
       <div className="right-panel">
         <Registers refresh={refresh} lastChangedRegister={lastChangedRegister} />
         <Memory refresh={refresh} lastChangedAddress={lastChangedAddress} />
+        <Cache refresh={refresh} />
       </div>
     </div>
   );

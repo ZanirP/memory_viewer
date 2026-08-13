@@ -71,6 +71,7 @@ def execute_one(machine):
 
     register_snapshot = machine["registers"].registers.copy()
     memory_snapshot = machine["memory"].memory[:]
+    cache_snapshot = machine["memory"].cache.snapshot()
     machine["current_instruction"] = instruction
     instruction.execute(machine["registers"], machine["memory"])
     if not getattr(instruction, "updates_pc", False):
@@ -81,6 +82,7 @@ def execute_one(machine):
         "instruction": instruction,
         "registers": register_snapshot,
         "memory": memory_snapshot,
+        "cache": cache_snapshot,
         "changedRegister": changed_register,
         "changedAddress": changed_address,
     })
@@ -146,6 +148,7 @@ def revert(x_session_id: str = Header(default="default")):
         history_entry = machine["history"].pop()
         machine["registers"].registers = history_entry["registers"]
         machine["memory"].memory = history_entry["memory"]
+        machine["memory"].cache.restore(history_entry["cache"])
         machine["current_instruction"] = machine["history"][-1]["instruction"] if machine["history"] else None
         reverted_pc, active_line = current_position(machine)
         return {
@@ -220,6 +223,13 @@ def memory(x_session_id: str = Header(default="default")):
         return MemoryModel(memory=machine["memory"].to_dict())
 
 
+@app.get("/cache")
+def cache(x_session_id: str = Header(default="default")):
+    machine = get_machine(x_session_id)
+    with machine["lock"]:
+        return machine["memory"].cache.to_dict()
+
+
 FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 FRONTEND_ASSETS = os.path.join(FRONTEND_DIST, "assets")
 if os.path.isdir(FRONTEND_ASSETS):
@@ -228,7 +238,7 @@ if os.path.isdir(FRONTEND_ASSETS):
 
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
-    api_paths = {"registers", "memory", "program", "save", "run-next-line", "revert", "reset", "run-all"}
+    api_paths = {"registers", "memory", "cache", "program", "save", "run-next-line", "revert", "reset", "run-all"}
     if full_path.startswith("api/") or full_path in api_paths:
         raise HTTPException(status_code=404, detail="API route not found")
     index_path = os.path.join(FRONTEND_DIST, "index.html")
